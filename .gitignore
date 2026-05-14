@@ -1,0 +1,23 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# SSH / keys (never commit)
+*.pem
+*.ppk
+*_privatekey*
+*_private_key*
+
+# Go
+bin/
+dist/
+*.exe
+*.test
+coverage.out
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
