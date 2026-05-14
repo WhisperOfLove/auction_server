@@ -7,7 +7,7 @@ import (
 
 	"auction_server/internal/config"
 	"auction_server/internal/domain"
-	"auction_server/internal/repository/memory"
+	"auction_server/internal/repository"
 	"auction_server/internal/service"
 )
 
@@ -17,8 +17,7 @@ type Server struct {
 	auctions *service.AuctionService
 }
 
-func NewServer(cfg config.Config) *http.Server {
-	repo := memory.NewAuctionRepository()
+func NewServer(cfg config.Config, repo repository.AuctionRepository) *http.Server {
 	s := &Server{
 		cfg:      cfg,
 		mux:      http.NewServeMux(),

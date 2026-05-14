@@ -27,7 +27,8 @@ They are not replacements; they solve different problems.
 - Clean architecture starter
 - Config-driven intervals (so admin can change without code edits)
 - Health endpoint
-- Placeholders for Redis/Kafka/Postgres integrations
+- **PostgreSQL**: set `POSTGRES_DSN` for real persistence (tables are created on startup). If unset, the server uses **in-memory** storage (handy for local runs).
+- Placeholders for Redis/Kafka (not wired yet)
 - Versioned API starter:
   - `GET /v1/auctions?status=ACTIVE&sort=new|trending`
   - `POST /v1/auctions`
@@ -44,17 +45,38 @@ They are not replacements; they solve different problems.
 - Profile `حراجی‌های من` can use `GET /v1/me/auctions`.
 - Owner-only ended contacts are exposed by `/result-contacts`.
 
-## Run locally now
+## Run locally (no database)
 1. Open terminal in `auction_server`
-2. Run:
-   - `go run ./cmd/api`
-3. Test:
-   - `GET http://localhost:8080/health`
-   - `GET http://localhost:8080/v1/auctions`
+2. Run `go run ./cmd/api` (leave `POSTGRES_DSN` unset for in-memory mode)
+3. Test `GET http://localhost:8080/health` and `GET http://localhost:8080/v1/auctions`
+
+## PostgreSQL on Ubuntu (VPS)
+
+```bash
+sudo apt update
+sudo apt install -y postgresql postgresql-contrib
+sudo -u postgres psql <<'SQL'
+CREATE USER auction WITH PASSWORD 'auction';
+CREATE DATABASE auction OWNER auction;
+GRANT ALL PRIVILEGES ON DATABASE auction TO auction;
+\c auction
+GRANT ALL ON SCHEMA public TO auction;
+GRANT CREATE ON SCHEMA public TO auction;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO auction;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO auction;
+SQL
+```
+
+Set on the server (e.g. in `.env`, then `set -a && source .env && set +a` before `./auction_api`):
+
+```bash
+POSTGRES_DSN=postgres://auction:auction@localhost:5432/auction?sslmode=disable
+```
+
+The API creates `auctions`, `bids`, and the id sequence on startup. Use a strong DB password in production and keep PostgreSQL bound to localhost (Ubuntu default).
 
 ## Next steps
 1. Implement auth service (phone OTP/JWT)
 2. Add websocket gateway for realtime auction detail updates
-3. Persist to PostgreSQL
-4. Add Redis bid engine + Kafka events
-5. Connect Android `RemoteAuctionRepository` to these APIs
+3. Add Redis bid engine + Kafka events
+4. Connect Android `RemoteAuctionRepository` to these APIs (REMOTE mode + `REMOTE_BASE_URL`)

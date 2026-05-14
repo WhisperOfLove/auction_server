@@ -27,7 +27,8 @@ func Load() Config {
 		Port:                       env("APP_PORT", "8080"),
 		TopBidsPushIntervalSeconds: env("TOP_BIDS_PUSH_INTERVAL_SECONDS", "10"),
 		FeedRefreshIntervalSeconds: env("FEED_REFRESH_INTERVAL_SECONDS", "30"),
-		PostgresDSN:                env("POSTGRES_DSN", "postgres://auction:auction@localhost:5432/auction?sslmode=disable"),
+		// Empty = in-memory store (local dev). Set on server for real persistence.
+		PostgresDSN: env("POSTGRES_DSN", ""),
 		RedisAddr:                  env("REDIS_ADDR", "localhost:6379"),
 		KafkaBrokers:               env("KAFKA_BROKERS", "localhost:9092"),
 	}
