@@ -12,6 +12,7 @@
 # Go
 bin/
 dist/
+auction_api
 *.exe
 *.test
 coverage.out
