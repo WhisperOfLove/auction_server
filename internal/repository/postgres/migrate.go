@@ -21,5 +21,5 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 			return err
 		}
 	}
-	return nil
+	return SeedUsers(ctx, pool)
 }

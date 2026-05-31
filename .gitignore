@@ -1,24 +1,64 @@
-# Secrets and local config
+# =============================================================================
+# Secrets and local runtime config (never commit)
+# =============================================================================
 .env
 .env.*
 !.env.example
+env.txt
+env.local.txt
+app_settings.json
 
-# SSH / keys (never commit)
+# SSH / keys
 *.pem
 *.ppk
 *_privatekey*
 *_private_key*
+id_rsa
+id_ed25519
+*.key
 
-# Go
+# =============================================================================
+# Go build artifacts
+# =============================================================================
 bin/
 dist/
 auction_api
+auction_api.exe
 *.exe
+*.dll
+*.so
+*.dylib
 *.test
+*.out
 coverage.out
+coverage.html
+__debug_bin*
 
-# OS / IDE
+# =============================================================================
+# Runtime data (server-generated)
+# =============================================================================
+uploads/
+*.log
+*.pid
+
+# =============================================================================
+# Deploy bundles (build on machine, copy to VPS — do not commit)
+# =============================================================================
+deploy-bundle/
+deploy-bundle.tar.gz
+deploy-bundle.zip
+*.tar.gz
+*.zip
+!vendor/**/*.zip
+
+# =============================================================================
+# OS / IDE / editor
+# =============================================================================
 .DS_Store
 Thumbs.db
+desktop.ini
 .idea/
 .vscode/
+*.swp
+*~
+.cursor/

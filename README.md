@@ -67,13 +67,55 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO auction;
 SQL
 ```
 
-Set on the server (e.g. in `.env`, then `set -a && source .env && set +a` before `./auction_api`):
+**Single config:** edit **`../haraj.config.json`**, run `python ../scripts/sync_haraj_config.py` to regenerate **`env.txt`**. See **`../HARAJ_CONFIG.md`**.
+
+Set on the server in **`env.txt`** (deploy.sh loads it automatically):
 
 ```bash
+POSTGRES_USER=auction
+POSTGRES_PASSWORD=auction
+POSTGRES_DB=auction
 POSTGRES_DSN=postgres://auction:auction@localhost:5432/auction?sslmode=disable
+PUBLIC_BASE_URL=http://YOUR_SERVER_IP:8080
 ```
 
+**Important:** use only **one** `POSTGRES_DSN` line. A second line with `YOUR_PASSWORD` will override the real password and the API will crash on start (nothing saved, `/health` unreachable from outside).
+
 The API creates `auctions`, `bids`, and the id sequence on startup. Use a strong DB password in production and keep PostgreSQL bound to localhost (Ubuntu default).
+
+Add to `.env` on the server for image URLs returned to the app:
+
+```bash
+PUBLIC_BASE_URL=http://YOUR_SERVER_IP:8080
+UPLOAD_DIR=uploads
+```
+
+## Deploy after `scp` (no git on server)
+
+From your PC:
+
+```powershell
+scp -r ".\auction_server" ubuntu@YOUR_IP:~/auction_server
+```
+
+On the VPS:
+
+```bash
+cd ~/auction_server
+tar -xzf deploy-bundle.tar.gz
+chmod +x server-keep.sh server-fresh.sh deploy.sh status.sh check-vps.sh
+sed -i 's/\r$//' *.sh env.txt
+./server-keep.sh
+# OR ./server-fresh.sh   # wipes DB
+```
+
+`./server-keep.sh` runs `deploy.sh`, `status.sh`, and `check-vps.sh` (checklist).
+
+If `curl` works on the server but not from your PC, open **TCP 8080** in the Arvan cloud firewall (security group) for the VPS.
+
+`deploy.sh` ensures PostgreSQL user/db, builds with `vendor` if present, and restarts `auction_api`.
+
+**VPS checklist:** `docs/VPS_CHECKLIST.md` — run `./check-vps.sh` on the server after deploy.
 
 ## Next steps
 1. Implement auth service (phone OTP/JWT)
